@@ -336,10 +336,21 @@
     audio.loop = true;
     audio.volume = 0;
     audio.addEventListener('canplaythrough', () => {
-      audioLoaded = true;
-      updatePercent();
-      checkAllLoaded();
+      if (!audioLoaded) {
+        audioLoaded = true;
+        updatePercent();
+        checkAllLoaded();
+      }
     });
+
+    // Fallback for mobile - audio may not load until interaction
+    setTimeout(() => {
+      if (!audioLoaded) {
+        audioLoaded = true;
+        updatePercent();
+        checkAllLoaded();
+      }
+    }, 3000);
 
     const spinnerBtn = document.querySelector('.spinner-btn');
 
