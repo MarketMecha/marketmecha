@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Questrial&display=swap" rel="stylesheet">
+  <title>Landing</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-image: url('bg_4.png');
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      background-position: top center;
+      z-index: 1;
+    }
+
+    .foreground {
+      position: fixed;
+      left: 0;
+      width: 100%;
+      z-index: 2;
+    }
+
+    #fg1 {
+      top: 55%;
+    }
+
+    #fg2 {
+      top: 190%;
+    }
+
+    .foreground img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .spacer {
+      height: 300vh;
+    }
+
+    .features {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 3vh;
+      pointer-events: none;
+    }
+
+    .feature {
+      font-family: 'Questrial', sans-serif;
+      font-size: 2.5vw;
+      color: white;
+      text-shadow: 0 0 30px rgba(0,0,0,0.9);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .feature:nth-child(odd) {
+      transform: translateX(-100vw);
+    }
+
+    .feature:nth-child(even) {
+      transform: translateX(100vw);
+    }
+
+    .feature span {
+      color: #00ffff;
+    }
+
+    .title {
+      position: fixed;
+      bottom: 10%;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .title h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      font-size: 6vw;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      text-shadow: 0 0 40px rgba(0,0,0,0.8);
+    }
+
+    .title .subtitle {
+      font-family: sans-serif;
+      font-size: 1.5vw;
+      color: white;
+      letter-spacing: 0.3em;
+      text-shadow: 0 0 20px rgba(0,0,0,0.8);
+      margin-top: 0.5em;
+    }
+
+    .cta {
+      margin-top: 2em;
+      padding: 1em 3em;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2vw;
+      color: white;
+      background: transparent;
+      border: 2px solid white;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      transition: all 0.3s ease;
+    }
+
+    .cta:hover {
+      background: white;
+      color: black;
+    }
+
+    .tagline {
+      position: fixed;
+      top: 15%;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .tagline.visible {
+      opacity: 1;
+    }
+
+    .tagline p {
+      font-family: 'Questrial', sans-serif;
+      font-size: 2vw;
+      color: white;
+      text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      pointer-events: auto;
+    }
+
+    .loader.hidden {
+      pointer-events: none;
+    }
+
+    .curtain {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: #000;
+      transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    .curtain-left {
+      left: 0;
+    }
+
+    .curtain-right {
+      right: 0;
+    }
+
+    .loader.open .curtain-left {
+      transform: translateX(-100%);
+    }
+
+    .loader.open .curtain-right {
+      transform: translateX(100%);
+    }
+
+    .loader-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: opacity 0.3s ease;
+    }
+
+    .loader.open .loader-content {
+      opacity: 0;
+    }
+
+    .spinner-btn {
+      width: 50px;
+      height: 50px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      cursor: default;
+    }
+
+    .spinner-btn span {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1vw;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .spinner-btn.morph {
+      width: 150px;
+      height: 50px;
+      border-radius: 4px;
+      border-color: white;
+      animation: none;
+      cursor: pointer;
+    }
+
+    .spinner-btn.morph span {
+      opacity: 1;
+    }
+
+    .spinner-btn.morph:hover {
+      background: white;
+    }
+
+    .spinner-btn.morph:hover span {
+      color: black;
+    }
+
+    .loading-percent {
+      margin-top: 20px;
+      font-family: 'Questrial', sans-serif;
+      font-size: 1.5vw;
+      color: white;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="curtain curtain-left"></div>
+    <div class="curtain curtain-right"></div>
+    <div class="loader-content">
+      <button class="spinner-btn"><span>Enter</span></button>
+      <div class="loading-percent">0%</div>
+    </div>
+  </div>
+  <div class="background"></div>
+  <div class="tagline">
+    <p>like WSB found a battle mecha.</p>
+  </div>
+  <div class="foreground" id="fg1">
+    <img src="foreground.png" alt="Bridge">
+  </div>
+  <div class="features">
+    <div class="feature"><span>1.</span> Timetravel and play "what if" scenarios</div>
+    <div class="feature"><span>2.</span> Code algo trading bots in JavaScript</div>
+    <div class="feature"><span>3.</span> Get AI assistance</div>
+    <div class="feature"><span>4.</span> Run simulations</div>
+    <div class="feature"><span>5.</span> Launch 🚀</div>
+    <div class="feature"><span>6.</span> With friends</div>
+  </div>
+  <div class="foreground" id="fg2">
+    <img src="foreground2.png" alt="Bridge 2">
+  </div>
+  <div class="title">
+    <h1>marketmecha</h1>
+    <p class="subtitle">マーケット メカニック</p>
+    <button class="cta">Enter</button>
+  </div>
+  <div class="spacer"></div>
+
+  <script>
+    const loader = document.querySelector('.loader');
+    const bg = document.querySelector('.background');
+    const fg1 = document.getElementById('fg1');
+    const fg2 = document.getElementById('fg2');
+    const tagline = document.querySelector('.tagline');
+    const title = document.querySelector('.title');
+    const spacer = document.querySelector('.spacer');
+    const features = document.querySelector('.features');
+    const featureItems = document.querySelectorAll('.feature');
+
+    // Track loading of all assets
+    const imagesToLoad = ['bg_4.png', 'foreground.png', 'foreground2.png'];
+    const totalAssets = imagesToLoad.length + 2; // images + font + audio
+    let loadedCount = 0;
+    let fontsLoaded = false;
+    let audioLoaded = false;
+    let bgImg;
+    const loadingPercent = document.querySelector('.loading-percent');
+
+    function updatePercent() {
+      let loaded = loadedCount + (fontsLoaded ? 1 : 0) + (audioLoaded ? 1 : 0);
+      const percent = Math.round((loaded / totalAssets) * 100);
+      loadingPercent.textContent = percent + '%';
+    }
+
+    // Audio setup
+    const audio = new Audio('rico.mp3');
+    audio.loop = true;
+    audio.volume = 0;
+    audio.addEventListener('canplaythrough', () => {
+      audioLoaded = true;
+      updatePercent();
+      checkAllLoaded();
+    });
+
+    const spinnerBtn = document.querySelector('.spinner-btn');
+
+    function checkAllLoaded() {
+      if (loadedCount === imagesToLoad.length && fontsLoaded && audioLoaded) {
+        // Morph spinner into button shape
+        spinnerBtn.classList.add('morph');
+      }
+    }
+
+    spinnerBtn.addEventListener('click', function() {
+      if (!spinnerBtn.classList.contains('morph')) return;
+      // Start audio
+      audio.play().catch(e => console.log('Audio play failed:', e));
+
+      // Fade in audio
+      let volume = 0;
+      const fadeIn = setInterval(() => {
+        volume += 0.02;
+        if (volume >= 1) {
+          volume = 1;
+          clearInterval(fadeIn);
+        }
+        audio.volume = volume;
+      }, 50);
+
+      // Open curtains
+      loader.classList.add('open');
+
+      setTimeout(() => {
+        loader.classList.add('hidden');
+        tagline.classList.add('visible');
+      }, 1200);
+    });
+
+    // Load all images
+    imagesToLoad.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      img.onload = function() {
+        loadedCount++;
+        if (src === 'bg_4.png') {
+          bgImg = img;
+          const aspectRatio = bgImg.height / bgImg.width;
+          const bgHeight = window.innerWidth * aspectRatio;
+          const scrollNeeded = (bgHeight - window.innerHeight) / 0.3;
+          spacer.style.height = scrollNeeded + window.innerHeight + 'px';
+        }
+        updatePercent();
+        checkAllLoaded();
+      };
+    });
+
+    // Wait for fonts
+    document.fonts.ready.then(() => {
+      fontsLoaded = true;
+      updatePercent();
+      checkAllLoaded();
+    });
+
+    window.addEventListener('scroll', function() {
+      const scrollY = window.scrollY;
+
+      // Background moves slower
+      bg.style.backgroundPositionY = -(scrollY * 0.3) + 'px';
+
+      // Foreground 1 moves faster
+      fg1.style.top = `calc(55% - ${scrollY * 0.7}px)`;
+
+      // Tagline moves at same speed as fg1
+      tagline.style.top = `calc(15% - ${scrollY * 0.7}px)`;
+
+      // Foreground 2 starts at 190%, moves slower
+      fg2.style.top = `calc(190% - ${scrollY * 0.4}px)`;
+
+      // Features section - slide based on scroll
+      const featuresStart = window.innerHeight * 0.1;
+      const featuresEnd = window.innerHeight * 4;
+      const featuresProgress = (scrollY - featuresStart) / (featuresEnd - featuresStart);
+
+      // Almost fixed, but drift slowly upward
+      const featuresY = 45 - (scrollY * 0.2 / window.innerHeight * 100);
+      features.style.top = featuresY + '%';
+
+      // Slide in each feature sequentially from alternating sides
+      featureItems.forEach((item, index) => {
+        const itemStart = index * 0.08;
+        const isOdd = index % 2 === 0;
+        const offScreen = isOdd ? -100 : 100;
+
+        if (featuresProgress > itemStart) {
+          const slideProgress = Math.min((featuresProgress - itemStart) / 0.2, 1);
+          item.style.opacity = slideProgress;
+          item.style.transform = `translateX(${offScreen * (1 - slideProgress)}vw)`;
+        } else {
+          item.style.opacity = 0;
+          item.style.transform = `translateX(${offScreen}vw)`;
+        }
+      });
+
+      // Show title near bottom
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const scrollProgress = scrollY / maxScroll;
+      if (scrollProgress > 0.6) {
+        const titleProgress = (scrollProgress - 0.6) / 0.4;
+        title.style.opacity = titleProgress;
+        title.style.transform = `translateY(${(1 - titleProgress) * 50}vh)`;
+      } else {
+        title.style.opacity = 0;
+        title.style.transform = 'translateY(50vh)';
+      }
+    });
+
+    window.addEventListener('resize', function() {
+      if (bgImg) {
+        const aspectRatio = bgImg.height / bgImg.width;
+        const bgHeight = window.innerWidth * aspectRatio;
+        const scrollNeeded = (bgHeight - window.innerHeight) / 0.3;
+        spacer.style.height = scrollNeeded + window.innerHeight + 'px';
+      }
+    });
+
+    </script>
+</body>
+</html>
