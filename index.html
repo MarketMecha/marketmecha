@@ -16,6 +16,7 @@
 
     body {
       overflow-x: hidden;
+      background: black;
     }
 
     .background {
@@ -24,11 +25,17 @@
       left: 0;
       width: 100%;
       height: 100vh;
-      background-image: url('assets/bg.png');
+      background-image: url('assets/bg_2.png');
       background-size: 100% auto;
       background-repeat: no-repeat;
       background-position: top center;
       z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+      .background {
+        background-image: url('assets/bg_3.png');
+      }
     }
 
     .foreground {
@@ -42,8 +49,20 @@
       top: 55%;
     }
 
+    @media (max-width: 768px) {
+      #fg1 {
+        top: 12%;
+      }
+    }
+
     #fg2 {
-      top: 190%;
+      top: 300%;
+    }
+
+    @media (max-width: 768px) {
+      #fg2 {
+        top: 50%;
+      }
     }
 
     .foreground img {
@@ -87,6 +106,17 @@
       color: #00ffff;
     }
 
+    @media (max-width: 768px) {
+      .features {
+        width: 95%;
+        left: 2.5%;
+        transform: none;
+      }
+      .feature {
+        font-size: 5vw;
+      }
+    }
+
     .title {
       position: fixed;
       bottom: 10%;
@@ -105,7 +135,12 @@
       color: white;
       text-transform: uppercase;
       letter-spacing: 0.2em;
-      text-shadow: 0 0 40px rgba(0,0,0,0.8);
+      text-shadow:
+        -1px -1px 0 black,
+        1px -1px 0 black,
+        -1px 1px 0 black,
+        1px 1px 0 black,
+        0 0 40px rgba(0,0,0,0.8);
     }
 
     .title .subtitle {
@@ -113,7 +148,12 @@
       font-size: 1.5vw;
       color: white;
       letter-spacing: 0.3em;
-      text-shadow: 0 0 20px rgba(0,0,0,0.8);
+      text-shadow:
+        -1px -1px 0 black,
+        1px -1px 0 black,
+        -1px 1px 0 black,
+        1px 1px 0 black,
+        0 0 20px rgba(0,0,0,0.8);
       margin-top: 0.5em;
     }
 
@@ -136,6 +176,49 @@
       color: black;
     }
 
+    @media (max-width: 768px) {
+      .title {
+        bottom: auto;
+        top: 5px;
+        padding: 0 5%;
+        z-index: 100;
+        opacity: 1 !important;
+      }
+      .title h1 {
+        font-size: 8vw;
+        margin-bottom: 0.3em;
+      }
+      .title .subtitle {
+        font-size: 3.5vw;
+        margin-bottom: 0.5em;
+      }
+      .title .cta {
+        display: none;
+      }
+    }
+
+    .mobile-cta {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-cta {
+        display: block;
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+      .mobile-cta .cta {
+        font-size: 4vw;
+        padding: 0.8em 2em;
+      }
+    }
+
     .tagline {
       position: fixed;
       top: 15%;
@@ -151,11 +234,28 @@
       opacity: 1;
     }
 
+    @media (max-width: 768px) {
+      .tagline.visible {
+        opacity: 0;
+      }
+    }
+
     .tagline p {
       font-family: 'Questrial', sans-serif;
       font-size: 2vw;
       color: white;
       text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    @media (max-width: 768px) {
+      .tagline {
+        top: 25%;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+      .tagline p {
+        font-size: 6vw;
+      }
     }
 
     .loader {
@@ -304,6 +404,9 @@
     <button class="cta">Enter</button>
   </div>
   <div class="spacer"></div>
+  <div class="mobile-cta">
+    <button class="cta">Enter</button>
+  </div>
 
   <script>
     const loader = document.querySelector('.loader');
@@ -315,9 +418,10 @@
     const spacer = document.querySelector('.spacer');
     const features = document.querySelector('.features');
     const featureItems = document.querySelectorAll('.feature');
+    const mobileCta = document.querySelector('.mobile-cta');
 
     // Track loading of all assets
-    const imagesToLoad = ['assets/bg.png', 'assets/foreground.png', 'assets/foreground2.png'];
+    const imagesToLoad = ['assets/bg_2.png', 'assets/bg_3.png', 'assets/foreground.png', 'assets/foreground2.png'];
     const totalAssets = imagesToLoad.length + 2; // images + font + audio
     let loadedCount = 0;
     let fontsLoaded = false;
@@ -392,11 +496,15 @@
       img.src = src;
       img.onload = function() {
         loadedCount++;
-        if (src === 'assets/bg.png') {
+        const isMobile = window.innerWidth <= 768;
+        if ((isMobile && src === 'assets/bg_3.png') || (!isMobile && src === 'assets/bg_2.png')) {
           bgImg = img;
           const aspectRatio = bgImg.height / bgImg.width;
           const bgHeight = window.innerWidth * aspectRatio;
-          const scrollNeeded = (bgHeight - window.innerHeight) / 0.3;
+          const isMobile = window.innerWidth <= 768;
+          // Desktop: use parallax calculation, Mobile: fixed 5 viewports
+          const parallaxSpeed = isMobile ? 1.0 : 0.5;
+          const scrollNeeded = (bgHeight - window.innerHeight) / parallaxSpeed;
           spacer.style.height = scrollNeeded + window.innerHeight + 'px';
         }
         updatePercent();
@@ -415,29 +523,46 @@
       const scrollY = window.scrollY;
 
       // Background moves slower
-      bg.style.backgroundPositionY = -(scrollY * 0.3) + 'px';
+      const bgParallax = window.innerWidth <= 768 ? 1.0 : 0.5;
+      bg.style.backgroundPositionY = -(scrollY * bgParallax) + 'px';
 
       // Foreground 1 moves faster
-      fg1.style.top = `calc(55% - ${scrollY * 0.7}px)`;
+      const fg1Start = window.innerWidth <= 768 ? 12 : 55;
+      const fg1Speed = window.innerWidth <= 768 ? 1.1 : 0.7;
+      fg1.style.top = `calc(${fg1Start}% - ${scrollY * fg1Speed}px)`;
 
-      // Tagline moves at same speed as fg1
-      tagline.style.top = `calc(15% - ${scrollY * 0.7}px)`;
+      // Tagline
+      const taglineStart = window.innerWidth <= 768 ? 25 : 15;
+      const taglineSpeed = window.innerWidth <= 768 ? 1.05 : 0.7;
+      tagline.style.top = `calc(${taglineStart}% - ${scrollY * taglineSpeed}px)`;
 
-      // Foreground 2 starts at 190%, moves slower
-      fg2.style.top = `calc(190% - ${scrollY * 0.4}px)`;
+      // On mobile, fade in tagline after 50px scroll
+      if (window.innerWidth <= 768) {
+        tagline.style.opacity = scrollY > 50 ? 1 : 0;
+        mobileCta.style.opacity = scrollY > 200 ? 1 : 0;
+      }
+
+      // Foreground 2 starts at 190% desktop, 80% mobile
+      const fg2Start = window.innerWidth <= 768 ? 50 : 300;
+      const fg2Speed = window.innerWidth <= 768 ? 1.4 : 0.6;
+      fg2.style.top = `calc(${fg2Start}% - ${scrollY * fg2Speed}px)`;
 
       // Features section - slide based on scroll
-      const featuresStart = window.innerHeight * 0.1;
-      const featuresEnd = window.innerHeight * 4;
+      const isMobileFeatures = window.innerWidth <= 768;
+      const featuresStart = isMobileFeatures ? window.innerHeight * 0.15 : window.innerHeight * 0.1;
+      const featuresEnd = isMobileFeatures ? window.innerHeight * 0.35 : window.innerHeight * 4;
       const featuresProgress = (scrollY - featuresStart) / (featuresEnd - featuresStart);
 
       // Almost fixed, but drift slowly upward
-      const featuresY = 45 - (scrollY * 0.2 / window.innerHeight * 100);
+      const featuresStartY = isMobileFeatures ? 73 : 45;
+      const featuresDriftSpeed = isMobileFeatures ? 0.6 : 0.2;
+      const featuresY = featuresStartY - (scrollY * featuresDriftSpeed / window.innerHeight * 100);
       features.style.top = featuresY + '%';
 
       // Slide in each feature sequentially from alternating sides
       featureItems.forEach((item, index) => {
-        const itemStart = index * 0.08;
+        const itemDelay = isMobileFeatures ? 0.01 : 0.08;
+        const itemStart = index * itemDelay;
         const isOdd = index % 2 === 0;
         const offScreen = isOdd ? -100 : 100;
 
@@ -453,14 +578,19 @@
 
       // Show title near bottom
       const maxScroll = document.body.scrollHeight - window.innerHeight;
-      const scrollProgress = scrollY / maxScroll;
-      if (scrollProgress > 0.6) {
-        const titleProgress = (scrollProgress - 0.6) / 0.4;
-        title.style.opacity = titleProgress;
-        title.style.transform = `translateY(${(1 - titleProgress) * 50}vh)`;
+      const scrollProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
+      const isMobile = window.innerWidth <= 768;
+
+      if (isMobile) {
+        // On mobile, scroll with background
+        title.style.top = `calc(5px - ${scrollY * bgParallax}px)`;
+      } else if (scrollProgress > 0.65) {
+        const titleProgress = (scrollProgress - 0.65) / 0.35;
+        title.style.opacity = Math.min(titleProgress, 1);
+        title.style.transform = `translateY(${(1 - Math.min(titleProgress, 1)) * 15}vh)`;
       } else {
         title.style.opacity = 0;
-        title.style.transform = 'translateY(50vh)';
+        title.style.transform = 'translateY(15vh)';
       }
     });
 
@@ -468,7 +598,9 @@
       if (bgImg) {
         const aspectRatio = bgImg.height / bgImg.width;
         const bgHeight = window.innerWidth * aspectRatio;
-        const scrollNeeded = (bgHeight - window.innerHeight) / 0.3;
+        const isMobile = window.innerWidth <= 768;
+        const parallaxSpeed = isMobile ? 1.0 : 0.5;
+        const scrollNeeded = (bgHeight - window.innerHeight) / parallaxSpeed;
         spacer.style.height = scrollNeeded + window.innerHeight + 'px';
       }
     });
