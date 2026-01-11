@@ -24,7 +24,7 @@
       left: 0;
       width: 100%;
       height: 100vh;
-      background-image: url('bg_4.png');
+      background-image: url('assets/bg.png');
       background-size: 100% auto;
       background-repeat: no-repeat;
       background-position: top center;
@@ -285,7 +285,7 @@
     <p>like WSB found a battle mecha.</p>
   </div>
   <div class="foreground" id="fg1">
-    <img src="foreground.png" alt="Bridge">
+    <img src="assets/foreground.png" alt="Bridge">
   </div>
   <div class="features">
     <div class="feature"><span>1.</span> Timetravel and play "what if" scenarios</div>
@@ -296,7 +296,7 @@
     <div class="feature"><span>6.</span> With friends</div>
   </div>
   <div class="foreground" id="fg2">
-    <img src="foreground2.png" alt="Bridge 2">
+    <img src="assets/foreground2.png" alt="Bridge 2">
   </div>
   <div class="title">
     <h1>marketmecha</h1>
@@ -317,7 +317,7 @@
     const featureItems = document.querySelectorAll('.feature');
 
     // Track loading of all assets
-    const imagesToLoad = ['bg_4.png', 'foreground.png', 'foreground2.png'];
+    const imagesToLoad = ['assets/bg.png', 'assets/foreground.png', 'assets/foreground2.png'];
     const totalAssets = imagesToLoad.length + 2; // images + font + audio
     let loadedCount = 0;
     let fontsLoaded = false;
@@ -332,7 +332,7 @@
     }
 
     // Audio setup
-    const audio = new Audio('rico.mp3');
+    const audio = new Audio('assets/rico.mp3');
     audio.loop = true;
     audio.volume = 0;
     audio.addEventListener('canplaythrough', () => {
@@ -392,7 +392,7 @@
       img.src = src;
       img.onload = function() {
         loadedCount++;
-        if (src === 'bg_4.png') {
+        if (src === 'assets/bg.png') {
           bgImg = img;
           const aspectRatio = bgImg.height / bgImg.width;
           const bgHeight = window.innerWidth * aspectRatio;
