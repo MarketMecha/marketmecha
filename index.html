@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Questrial&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Questrial&family=Noto+Sans+JP:wght@700;900&display=swap" rel="stylesheet">
   <title>Landing</title>
   <style>
     * {
@@ -51,7 +51,7 @@
 
     @media (max-width: 768px) {
       #fg1 {
-        top: 12%;
+        top: 13%;
       }
     }
 
@@ -92,6 +92,9 @@
       color: white;
       text-shadow: 0 0 30px rgba(0,0,0,0.9);
       transition: opacity 0.6s ease, transform 0.6s ease;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 1vh 2vw;
+      border-radius: 8px;
     }
 
     .feature:nth-child(odd) {
@@ -103,7 +106,7 @@
     }
 
     .feature span {
-      color: #00ffff;
+      color: white;
     }
 
     @media (max-width: 768px) {
@@ -144,16 +147,13 @@
     }
 
     .title .subtitle {
-      font-family: sans-serif;
-      font-size: 1.5vw;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 900;
+      font-size: 2.5vw;
       color: white;
-      letter-spacing: 0.3em;
-      text-shadow:
-        -1px -1px 0 black,
-        1px -1px 0 black,
-        -1px 1px 0 black,
-        1px 1px 0 black,
-        0 0 20px rgba(0,0,0,0.8);
+      letter-spacing: 0.2em;
+      -webkit-text-stroke: 4px black;
+      paint-order: stroke fill;
       margin-top: 0.5em;
     }
 
@@ -189,7 +189,7 @@
         margin-bottom: 0.3em;
       }
       .title .subtitle {
-        font-size: 3.5vw;
+        font-size: 5vw;
         margin-bottom: 0.5em;
       }
       .title .cta {
@@ -242,14 +242,14 @@
 
     .tagline p {
       font-family: 'Questrial', sans-serif;
-      font-size: 2vw;
+      font-size: 3vw;
       color: white;
       text-shadow: 0 0 20px rgba(0,0,0,0.8);
     }
 
     @media (max-width: 768px) {
       .tagline {
-        top: 25%;
+        top: 27%;
         opacity: 0;
         transition: opacity 0.5s ease;
       }
@@ -388,12 +388,11 @@
     <img src="assets/foreground.png" alt="Bridge">
   </div>
   <div class="features">
-    <div class="feature"><span>1.</span> Timetravel and play "what if" scenarios</div>
-    <div class="feature"><span>2.</span> Code algo trading bots in JavaScript</div>
-    <div class="feature"><span>3.</span> Get AI assistance</div>
-    <div class="feature"><span>4.</span> Run simulations</div>
-    <div class="feature"><span>5.</span> Launch 🚀</div>
-    <div class="feature"><span>6.</span> With friends</div>
+    <div class="feature"><span>1.</span> Time travel to relive "whatif" trades</div>
+    <div class="feature"><span>2.</span> Summon algo trading bots Ϟ(๑⚈ ․̫ ⚈๑)⋆</div>
+    <div class="feature"><span>3.</span> Mind link with AI symbiotes</div>
+    <div class="feature"><span>4.</span> Escape the simulator and livetrade</div>
+    <div class="feature"><span>5.</span> Party like it's 1999 with other questers</div>
   </div>
   <div class="foreground" id="fg2">
     <img src="assets/foreground2.png" alt="Bridge 2">
@@ -527,18 +526,18 @@
       bg.style.backgroundPositionY = -(scrollY * bgParallax) + 'px';
 
       // Foreground 1 moves faster
-      const fg1Start = window.innerWidth <= 768 ? 12 : 55;
-      const fg1Speed = window.innerWidth <= 768 ? 1.1 : 0.7;
+      const fg1Start = window.innerWidth <= 768 ? 13 : 55;
+      const fg1Speed = window.innerWidth <= 768 ? 1.15 : 0.7;
       fg1.style.top = `calc(${fg1Start}% - ${scrollY * fg1Speed}px)`;
 
       // Tagline
-      const taglineStart = window.innerWidth <= 768 ? 25 : 15;
+      const taglineStart = window.innerWidth <= 768 ? 27 : 15;
       const taglineSpeed = window.innerWidth <= 768 ? 1.05 : 0.7;
       tagline.style.top = `calc(${taglineStart}% - ${scrollY * taglineSpeed}px)`;
 
-      // On mobile, fade in tagline after 50px scroll
+      // On mobile, fade in tagline after 40px scroll
       if (window.innerWidth <= 768) {
-        tagline.style.opacity = scrollY > 50 ? 1 : 0;
+        tagline.style.opacity = scrollY > 40 ? 1 : 0;
         mobileCta.style.opacity = scrollY > 200 ? 1 : 0;
       }
 
@@ -554,8 +553,8 @@
       const featuresProgress = (scrollY - featuresStart) / (featuresEnd - featuresStart);
 
       // Almost fixed, but drift slowly upward
-      const featuresStartY = isMobileFeatures ? 73 : 45;
-      const featuresDriftSpeed = isMobileFeatures ? 0.6 : 0.2;
+      const featuresStartY = isMobileFeatures ? 73 : 80;
+      const featuresDriftSpeed = isMobileFeatures ? 0.6 : 0.22;
       const featuresY = featuresStartY - (scrollY * featuresDriftSpeed / window.innerHeight * 100);
       features.style.top = featuresY + '%';
 
