@@ -430,6 +430,19 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    @media (max-width: 768px) {
+      .spinner-btn.morph {
+        width: auto;
+        padding: 0.8em 2em;
+      }
+      .spinner-btn span {
+        font-size: 4vw;
+      }
+      .loading-percent {
+        font-size: 8vw;
+      }
+    }
   </style>
 </head>
 <body>
