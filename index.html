@@ -75,48 +75,109 @@
       height: 300vh;
     }
 
+    /* Desktop features - with line and highlighting */
     .features {
       position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 10%;
+      top: 50%;
+      transform: translateY(-50%);
       z-index: 5;
       display: flex;
-      flex-direction: column;
-      gap: 3vh;
+      flex-direction: row;
       pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .features-line {
+      width: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      margin-right: 20px;
+      position: relative;
+    }
+
+    .features-line::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--line-progress, 0%);
+      background: #00ff88;
+      transition: height 0.3s ease;
+    }
+
+    .features-scroll {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2vh;
     }
 
     .feature {
       font-family: 'Questrial', sans-serif;
       font-size: 2.5vw;
-      color: white;
+      color: rgba(255, 255, 255, 0.5);
       text-shadow: 0 0 30px rgba(0,0,0,0.9);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      transition: color 0.3s ease, opacity 0.6s ease, transform 0.6s ease;
       background: rgba(0, 0, 0, 0.2);
       padding: 1vh 2vw;
       border-radius: 8px;
     }
 
-    .feature:nth-child(odd) {
-      transform: translateX(-100vw);
+    .feature.active {
+      color: #00ff88;
     }
 
-    .feature:nth-child(even) {
-      transform: translateX(100vw);
-    }
-
-    .feature span {
+    .feature.passed {
       color: white;
     }
 
+    /* Mobile features - original slide-in behavior */
     @media (max-width: 768px) {
       .features {
+        left: 50%;
+        transform: translateX(-50%);
         width: 95%;
         left: 2.5%;
-        transform: none;
+        flex-direction: column;
+        gap: 3vh;
+      }
+      .features-scroll {
+        display: contents;
+      }
+      .features-line {
+        display: none;
+      }
+      .features-list {
+        display: contents;
       }
       .feature {
         font-size: 5vw;
+        color: white;
+        transition: opacity 0.6s ease, transform 0.6s ease;
+        display: flex;
+        align-items: center;
+        gap: 3vw;
+      }
+      .feature::before {
+        content: '◆';
+        font-size: 4vw;
+        flex-shrink: 0;
+      }
+      .feature:nth-child(1)::before { color: #ff6b6b; }
+      .feature:nth-child(2)::before { color: #4ecdc4; }
+      .feature:nth-child(3)::before { color: #ffe66d; }
+      .feature:nth-child(4)::before { color: #95e1d3; }
+      .feature:nth-child(5)::before { color: #dda0dd; }
+      .feature:nth-child(odd) {
+        transform: translateX(-100vw);
+      }
+      .feature:nth-child(even) {
+        transform: translateX(100vw);
       }
     }
 
@@ -388,11 +449,16 @@
     <img src="assets/foreground.png" alt="Bridge">
   </div>
   <div class="features">
-    <div class="feature"><span>1.</span> Time travel to relive "whatif" trades</div>
-    <div class="feature"><span>2.</span> Summon algo trading bots Ϟ(๑⚈ ․̫ ⚈๑)⋆</div>
-    <div class="feature"><span>3.</span> Mind link with AI symbiotes</div>
-    <div class="feature"><span>4.</span> Escape the simulator and livetrade</div>
-    <div class="feature"><span>5.</span> Party like it's 1999 with other questers</div>
+    <div class="features-scroll">
+      <div class="features-line"></div>
+      <div class="features-list">
+        <div class="feature">Time travel to relive "whatif" trades</div>
+        <div class="feature">Summon algo trading bots Ϟ(๑⚈ ․̫ ⚈๑)⋆</div>
+        <div class="feature">Mind link with AI symbiotes</div>
+        <div class="feature">Escape the simulator and livetrade</div>
+        <div class="feature">Party like it's 1999 with other questers</div>
+      </div>
+    </div>
   </div>
   <div class="foreground" id="fg2">
     <img src="assets/foreground2.png" alt="Bridge 2">
@@ -416,12 +482,14 @@
     const title = document.querySelector('.title');
     const spacer = document.querySelector('.spacer');
     const features = document.querySelector('.features');
+    const featuresLine = document.querySelector('.features-line');
+    const featuresScroll = document.querySelector('.features-scroll');
     const featureItems = document.querySelectorAll('.feature');
     const mobileCta = document.querySelector('.mobile-cta');
 
     // Track loading of all assets
     const imagesToLoad = ['assets/bg_2.png', 'assets/bg_3.png', 'assets/foreground.png', 'assets/foreground2.png'];
-    const totalAssets = imagesToLoad.length + 2; // images + font + audio
+    const totalAssets = imagesToLoad.length + 2;
     let loadedCount = 0;
     let fontsLoaded = false;
     let audioLoaded = false;
@@ -446,7 +514,6 @@
       }
     });
 
-    // Fallback for mobile - audio may not load until interaction
     setTimeout(() => {
       if (!audioLoaded) {
         audioLoaded = true;
@@ -459,17 +526,14 @@
 
     function checkAllLoaded() {
       if (loadedCount === imagesToLoad.length && fontsLoaded && audioLoaded) {
-        // Morph spinner into button shape
         spinnerBtn.classList.add('morph');
       }
     }
 
     spinnerBtn.addEventListener('click', function() {
       if (!spinnerBtn.classList.contains('morph')) return;
-      // Start audio
       audio.play().catch(e => console.log('Audio play failed:', e));
 
-      // Fade in audio
       let volume = 0;
       const fadeIn = setInterval(() => {
         volume += 0.02;
@@ -480,7 +544,6 @@
         audio.volume = volume;
       }, 50);
 
-      // Open curtains
       loader.classList.add('open');
 
       setTimeout(() => {
@@ -489,7 +552,6 @@
       }, 1200);
     });
 
-    // Load all images
     imagesToLoad.forEach(src => {
       const img = new Image();
       img.src = src;
@@ -500,8 +562,6 @@
           bgImg = img;
           const aspectRatio = bgImg.height / bgImg.width;
           const bgHeight = window.innerWidth * aspectRatio;
-          const isMobile = window.innerWidth <= 768;
-          // Desktop: use parallax calculation, Mobile: fixed 5 viewports
           const parallaxSpeed = isMobile ? 1.0 : 0.5;
           const scrollNeeded = (bgHeight - window.innerHeight) / parallaxSpeed;
           spacer.style.height = scrollNeeded + window.innerHeight + 'px';
@@ -511,7 +571,6 @@
       };
     });
 
-    // Wait for fonts
     document.fonts.ready.then(() => {
       fontsLoaded = true;
       updatePercent();
@@ -520,68 +579,151 @@
 
     window.addEventListener('scroll', function() {
       const scrollY = window.scrollY;
+      const isMobile = window.innerWidth <= 768;
 
-      // Background moves slower
-      const bgParallax = window.innerWidth <= 768 ? 1.0 : 0.5;
+      // Background parallax
+      const bgParallax = isMobile ? 1.0 : 0.5;
       bg.style.backgroundPositionY = -(scrollY * bgParallax) + 'px';
 
-      // Foreground 1 moves faster
-      const fg1Start = window.innerWidth <= 768 ? 13 : 55;
-      const fg1Speed = window.innerWidth <= 768 ? 1.15 : 0.7;
+      // Foreground 1
+      const fg1Start = isMobile ? 13 : 55;
+      const fg1Speed = isMobile ? 1.15 : 0.7;
       fg1.style.top = `calc(${fg1Start}% - ${scrollY * fg1Speed}px)`;
 
       // Tagline
-      const taglineStart = window.innerWidth <= 768 ? 27 : 15;
-      const taglineSpeed = window.innerWidth <= 768 ? 1.05 : 0.7;
+      const taglineStart = isMobile ? 27 : 15;
+      const taglineSpeed = isMobile ? 1.05 : 0.7;
       tagline.style.top = `calc(${taglineStart}% - ${scrollY * taglineSpeed}px)`;
 
-      // On mobile, fade in tagline after 40px scroll
-      if (window.innerWidth <= 768) {
+      if (isMobile) {
         tagline.style.opacity = scrollY > 40 ? 1 : 0;
         mobileCta.style.opacity = scrollY > 200 ? 1 : 0;
       }
 
-      // Foreground 2 starts at 190% desktop, 80% mobile
-      const fg2Start = window.innerWidth <= 768 ? 50 : 300;
-      const fg2Speed = window.innerWidth <= 768 ? 1.4 : 0.6;
+      // Foreground 2
+      const fg2Start = isMobile ? 50 : 400;
+      const fg2Speed = isMobile ? 1.4 : 0.75;
       fg2.style.top = `calc(${fg2Start}% - ${scrollY * fg2Speed}px)`;
 
-      // Features section - slide based on scroll
-      const isMobileFeatures = window.innerWidth <= 768;
-      const featuresStart = isMobileFeatures ? window.innerHeight * 0.15 : window.innerHeight * 0.1;
-      const featuresEnd = isMobileFeatures ? window.innerHeight * 0.35 : window.innerHeight * 4;
-      const featuresProgress = (scrollY - featuresStart) / (featuresEnd - featuresStart);
-
-      // Almost fixed, but drift slowly upward
-      const featuresStartY = isMobileFeatures ? 73 : 80;
-      const featuresDriftSpeed = isMobileFeatures ? 0.6 : 0.22;
-      const featuresY = featuresStartY - (scrollY * featuresDriftSpeed / window.innerHeight * 100);
-      features.style.top = featuresY + '%';
-
-      // Slide in each feature sequentially from alternating sides
-      featureItems.forEach((item, index) => {
-        const itemDelay = isMobileFeatures ? 0.01 : 0.08;
-        const itemStart = index * itemDelay;
-        const isOdd = index % 2 === 0;
-        const offScreen = isOdd ? -100 : 100;
-
-        if (featuresProgress > itemStart) {
-          const slideProgress = Math.min((featuresProgress - itemStart) / 0.2, 1);
-          item.style.opacity = slideProgress;
-          item.style.transform = `translateX(${offScreen * (1 - slideProgress)}vw)`;
-        } else {
-          item.style.opacity = 0;
-          item.style.transform = `translateX(${offScreen}vw)`;
-        }
-      });
-
-      // Show title near bottom
-      const maxScroll = document.body.scrollHeight - window.innerHeight;
-      const scrollProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
-      const isMobile = window.innerWidth <= 768;
+      // Features section
+      const itemCount = featureItems.length;
 
       if (isMobile) {
-        // On mobile, scroll with background
+        // MOBILE: Original behavior - drift upward + slide in from sides
+        const featuresStartY = 73;
+        const featuresDriftSpeed = 0.6;
+        const featuresY = featuresStartY - (scrollY * featuresDriftSpeed / window.innerHeight * 100);
+        features.style.top = featuresY + '%';
+        features.style.left = '2.5%';
+        features.style.transform = 'none';
+        features.style.opacity = '1';
+
+        // Calculate progress for slide-in
+        const featuresStart = window.innerHeight * 0.15;
+        const featuresEnd = window.innerHeight * 0.35;
+        const featuresProgress = (scrollY - featuresStart) / (featuresEnd - featuresStart);
+
+        // Slide in each feature sequentially
+        featureItems.forEach((item, index) => {
+          const itemDelay = 0.01;
+          const itemStart = index * itemDelay;
+          const isOdd = index % 2 === 0;
+          const offScreen = isOdd ? -100 : 100;
+
+          if (featuresProgress > itemStart) {
+            const slideProgress = Math.min((featuresProgress - itemStart) / 0.2, 1);
+            item.style.opacity = slideProgress;
+            item.style.transform = `translateX(${offScreen * (1 - slideProgress)}vw)`;
+          } else {
+            item.style.opacity = 0;
+            item.style.transform = `translateX(${offScreen}vw)`;
+          }
+          item.classList.remove('active', 'passed');
+        });
+
+      } else {
+        // DESKTOP: New behavior - anchored with line and highlighting
+        const featuresAnchor = 145;
+        const featuresSpeed = 0.35;
+
+        const featuresTop = featuresAnchor - (scrollY * featuresSpeed / window.innerHeight * 100);
+        features.style.top = `${featuresTop}vh`;
+        features.style.left = '10%';
+        features.style.transform = 'translateY(-50%)';
+        features.style.opacity = '1';
+
+        // Reset inline styles that mobile might have set
+        featureItems.forEach(item => {
+          item.style.opacity = '';
+          item.style.transform = '';
+        });
+
+        // Scrolling through items
+        const featuresCenterScroll = (featuresAnchor - 50) * window.innerHeight / 100 / featuresSpeed;
+        const readingRange = window.innerHeight * 1.5;
+        const featuresReadStart = featuresCenterScroll;
+        const featuresReadEnd = featuresCenterScroll + readingRange;
+
+        if (scrollY >= featuresReadStart && scrollY <= featuresReadEnd) {
+          const readProgress = (scrollY - featuresReadStart) / (featuresReadEnd - featuresReadStart);
+          const itemHeight = 8;
+          const maxOffset = (itemCount - 1) * itemHeight;
+          const listOffset = readProgress * maxOffset;
+          featuresScroll.style.transform = `translateY(-${listOffset}vh)`;
+        } else if (scrollY < featuresReadStart) {
+          featuresScroll.style.transform = 'translateY(0)';
+        } else {
+          const itemHeight = 8;
+          const maxOffset = (itemCount - 1) * itemHeight;
+          featuresScroll.style.transform = `translateY(-${maxOffset}vh)`;
+        }
+
+        // Highlight items based on 50% viewport threshold
+        const viewportThreshold = window.innerHeight * 0.5;
+        let lastPassedIndex = -1;
+
+        featureItems.forEach((item, index) => {
+          const rect = item.getBoundingClientRect();
+          const itemCenter = rect.top + rect.height / 2;
+
+          if (itemCenter < viewportThreshold) {
+            item.classList.remove('active');
+            item.classList.add('passed');
+            lastPassedIndex = index;
+          } else {
+            item.classList.remove('active', 'passed');
+          }
+        });
+
+        const activeItemIndex = lastPassedIndex + 1;
+        let hasActiveItem = false;
+        if (activeItemIndex < itemCount) {
+          const activeRect = featureItems[activeItemIndex].getBoundingClientRect();
+          const activeCenter = activeRect.top + activeRect.height / 2;
+          if (lastPassedIndex >= 0 || activeCenter < viewportThreshold + activeRect.height) {
+            featureItems[activeItemIndex].classList.add('active');
+            hasActiveItem = true;
+          }
+        } else if (lastPassedIndex === itemCount - 1) {
+          featureItems[lastPassedIndex].classList.remove('passed');
+          featureItems[lastPassedIndex].classList.add('active');
+          hasActiveItem = true;
+        }
+
+        let lineProgress = 0;
+        if (lastPassedIndex >= 0) {
+          lineProgress = ((lastPassedIndex + 1 + (hasActiveItem ? 1 : 0)) / itemCount) * 100;
+        } else if (hasActiveItem) {
+          lineProgress = (1 / itemCount) * 100;
+        }
+        featuresLine.style.setProperty('--line-progress', Math.min(lineProgress, 100) + '%');
+      }
+
+      // Title
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const scrollProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
+
+      if (isMobile) {
         title.style.top = `calc(5px - ${scrollY * bgParallax}px)`;
       } else if (scrollProgress > 0.65) {
         const titleProgress = (scrollProgress - 0.65) / 0.35;
@@ -604,6 +746,8 @@
       }
     });
 
-    </script>
+    // Trigger scroll handler on page load
+    window.dispatchEvent(new Event('scroll'));
+  </script>
 </body>
 </html>
