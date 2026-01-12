@@ -78,7 +78,11 @@
     /* Desktop features - with line and highlighting */
     .features {
       position: fixed;
-      left: 10%;
+      left: 0;
+      right: 0;
+      margin-left: auto;
+      margin-right: auto;
+      width: fit-content;
       top: 50%;
       transform: translateY(-50%);
       z-index: 5;
@@ -86,6 +90,56 @@
       flex-direction: row;
       pointer-events: none;
       transition: opacity 0.3s ease;
+    }
+
+    /* Trading card display */
+    .feature-card {
+      margin-left: 4vw;
+      width: 20vw;
+      position: relative;
+      align-self: stretch;
+    }
+
+    .feature-card img {
+      position: absolute;
+      width: auto;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      border: 4px solid #c0a060;
+      border-radius: 12px;
+      box-shadow:
+        0 0 0 2px #1a1a1a,
+        0 0 20px rgba(0,0,0,0.8),
+        inset 0 0 20px rgba(255,215,0,0.1);
+      background: linear-gradient(145deg, #d4af37, #aa8c2c);
+      padding: 3px;
+    }
+
+    .feature-card img.active {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .feature-card {
+        position: fixed;
+        top: 20%;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: 40vw;
+        height: 56vw;
+        z-index: 6;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        display: flex;
+        justify-content: center;
+      }
+      .feature-card img {
+        position: absolute;
+        height: 100%;
+        width: auto;
+      }
     }
 
     .features-line {
@@ -139,10 +193,10 @@
     /* Mobile features - original slide-in behavior */
     @media (max-width: 768px) {
       .features {
-        left: 50%;
-        transform: translateX(-50%);
-        width: 95%;
         left: 2.5%;
+        right: auto;
+        width: 95%;
+        transform: none;
         flex-direction: column;
         gap: 3vh;
       }
@@ -465,11 +519,18 @@
     <div class="features-scroll">
       <div class="features-line"></div>
       <div class="features-list">
-        <div class="feature">Time travel to relive "whatif" trades</div>
-        <div class="feature">Summon algo trading bots Ϟ(๑⚈ ․̫ ⚈๑)⋆</div>
-        <div class="feature">Mind link with AI symbiotes</div>
-        <div class="feature">Escape the simulator and livetrade</div>
-        <div class="feature">Party like it's 1999 with other questers</div>
+        <div class="feature">Timewarp to trade January 2021 💎🤲</div>
+        <div class="feature">Summon algo trading bots Ϟ(๑⚈ ․̫ ⚈@)⋆</div>
+        <div class="feature">Fusion with AI symbiote</div>
+        <div class="feature">Escape the simulation. Deploy capital.</div>
+        <div class="feature">Party like it's 1999 with other duelists</div>
+      </div>
+      <div class="feature-card">
+        <img src="assets/card_1.png" alt="Card 1">
+        <img src="assets/card_2.png" alt="Card 2">
+        <img src="assets/card_3.png" alt="Card 3">
+        <img src="assets/card_4.png" alt="Card 4">
+        <img src="assets/card_5.png" alt="Card 5">
       </div>
     </div>
   </div>
@@ -499,6 +560,8 @@
     const featuresScroll = document.querySelector('.features-scroll');
     const featureItems = document.querySelectorAll('.feature');
     const mobileCta = document.querySelector('.mobile-cta');
+    const featureCard = document.querySelector('.feature-card');
+    const cardImages = document.querySelectorAll('.feature-card img');
 
     // Track loading of all assets
     const imagesToLoad = ['assets/bg_2.png', 'assets/bg_3.png', 'assets/foreground.png', 'assets/foreground2.png'];
@@ -628,30 +691,31 @@
         const featuresY = featuresStartY - (scrollY * featuresDriftSpeed / window.innerHeight * 100);
         features.style.top = featuresY + '%';
         features.style.left = '2.5%';
+        features.style.right = 'auto';
+        features.style.width = '95%';
+        features.style.marginLeft = '0';
+        features.style.marginRight = '0';
         features.style.transform = 'none';
         features.style.opacity = '1';
 
-        // Calculate progress for slide-in
-        const featuresStart = window.innerHeight * 0.15;
-        const featuresEnd = window.innerHeight * 0.35;
-        const featuresProgress = (scrollY - featuresStart) / (featuresEnd - featuresStart);
+        // Show features once scrolled enough
+        const featuresStart = window.innerHeight * 0.1;
+        const showFeatures = scrollY > featuresStart;
+        const showCard = scrollY > window.innerHeight * 0.3;
 
-        // Slide in each feature sequentially
+        // Show/hide card
+        featureCard.style.opacity = showCard ? '1' : '0';
+
         featureItems.forEach((item, index) => {
-          const itemDelay = 0.01;
-          const itemStart = index * itemDelay;
-          const isOdd = index % 2 === 0;
-          const offScreen = isOdd ? -100 : 100;
-
-          if (featuresProgress > itemStart) {
-            const slideProgress = Math.min((featuresProgress - itemStart) / 0.2, 1);
-            item.style.opacity = slideProgress;
-            item.style.transform = `translateX(${offScreen * (1 - slideProgress)}vw)`;
+          if (showFeatures) {
+            item.style.opacity = 1;
+            item.style.transform = 'translateX(0)';
           } else {
+            const isOdd = index % 2 === 0;
+            const offScreen = isOdd ? -100 : 100;
             item.style.opacity = 0;
             item.style.transform = `translateX(${offScreen}vw)`;
           }
-          item.classList.remove('active', 'passed');
         });
 
       } else {
@@ -659,9 +723,29 @@
         const featuresAnchor = 145;
         const featuresSpeed = 0.35;
 
-        const featuresTop = featuresAnchor - (scrollY * featuresSpeed / window.innerHeight * 100);
+        // Calculate when features reach center
+        const featuresCenterScroll = (featuresAnchor - 50) * window.innerHeight / 100 / featuresSpeed;
+        const readingRange = window.innerHeight * 1.5;
+        const featuresReadStart = featuresCenterScroll;
+        const featuresReadEnd = featuresCenterScroll + readingRange;
+
+        // Lock container position during reading phase
+        let featuresTop;
+        if (scrollY < featuresReadStart) {
+          featuresTop = featuresAnchor - (scrollY * featuresSpeed / window.innerHeight * 100);
+        } else if (scrollY <= featuresReadEnd) {
+          featuresTop = 50; // Locked at center
+        } else {
+          const scrollPastRead = scrollY - featuresReadEnd;
+          featuresTop = 50 - (scrollPastRead * featuresSpeed / window.innerHeight * 100);
+        }
+
         features.style.top = `${featuresTop}vh`;
-        features.style.left = '10%';
+        features.style.left = '0';
+        features.style.right = '0';
+        features.style.width = 'fit-content';
+        features.style.marginLeft = 'auto';
+        features.style.marginRight = 'auto';
         features.style.transform = 'translateY(-50%)';
         features.style.opacity = '1';
 
@@ -671,12 +755,7 @@
           item.style.transform = '';
         });
 
-        // Scrolling through items
-        const featuresCenterScroll = (featuresAnchor - 50) * window.innerHeight / 100 / featuresSpeed;
-        const readingRange = window.innerHeight * 1.5;
-        const featuresReadStart = featuresCenterScroll;
-        const featuresReadEnd = featuresCenterScroll + readingRange;
-
+        // Scrolling through items (only during reading phase)
         if (scrollY >= featuresReadStart && scrollY <= featuresReadEnd) {
           const readProgress = (scrollY - featuresReadStart) / (featuresReadEnd - featuresReadStart);
           const itemHeight = 8;
@@ -730,6 +809,15 @@
           lineProgress = (1 / itemCount) * 100;
         }
         featuresLine.style.setProperty('--line-progress', Math.min(lineProgress, 100) + '%');
+
+        // Update card display based on active item
+        let activeCardIndex = -1;
+        if (hasActiveItem) {
+          activeCardIndex = activeItemIndex < itemCount ? activeItemIndex : lastPassedIndex;
+        }
+        cardImages.forEach((card, index) => {
+          card.classList.toggle('active', index === activeCardIndex);
+        });
       }
 
       // Title
@@ -761,6 +849,47 @@
 
     // Trigger scroll handler on page load
     window.dispatchEvent(new Event('scroll'));
+
+    // Mobile card auto-rotation
+    let mobileCardIndex = 0;
+    let mobileRotationInterval = null;
+
+    function startMobileRotation() {
+      if (mobileRotationInterval) return;
+      mobileRotationInterval = setInterval(() => {
+        if (window.innerWidth <= 768) {
+          // Update card
+          cardImages.forEach((card, index) => {
+            card.classList.toggle('active', index === mobileCardIndex);
+          });
+          // Highlight feature
+          featureItems.forEach((item, index) => {
+            item.classList.toggle('active', index === mobileCardIndex);
+          });
+          // Next card
+          mobileCardIndex = (mobileCardIndex + 1) % featureItems.length;
+        }
+      }, 1500);
+    }
+
+    function stopMobileRotation() {
+      if (mobileRotationInterval) {
+        clearInterval(mobileRotationInterval);
+        mobileRotationInterval = null;
+      }
+    }
+
+    // Start rotation
+    startMobileRotation();
+
+    // Pause when page hidden, resume when visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopMobileRotation();
+      } else {
+        startMobileRotation();
+      }
+    });
   </script>
 </body>
 </html>
