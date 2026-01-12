@@ -687,7 +687,7 @@
       if (isMobile) {
         // MOBILE: Original behavior - drift upward + slide in from sides
         const featuresStartY = 85;
-        const featuresDriftSpeed = 0.5;
+        const featuresDriftSpeed = 0.55;
         const featuresY = featuresStartY - (scrollY * featuresDriftSpeed / window.innerHeight * 100);
         features.style.top = featuresY + '%';
         features.style.left = '2.5%';
