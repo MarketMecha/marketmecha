@@ -123,7 +123,7 @@
     @media (max-width: 768px) {
       .feature-card {
         position: fixed;
-        top: 14%;
+        top: 10%;
         left: 0;
         right: 0;
         margin: 0 auto;
@@ -686,8 +686,8 @@
 
       if (isMobile) {
         // MOBILE: Original behavior - drift upward + slide in from sides
-        const featuresStartY = 78;
-        const featuresDriftSpeed = 0.6;
+        const featuresStartY = 85;
+        const featuresDriftSpeed = 0.5;
         const featuresY = featuresStartY - (scrollY * featuresDriftSpeed / window.innerHeight * 100);
         features.style.top = featuresY + '%';
         features.style.left = '2.5%';
